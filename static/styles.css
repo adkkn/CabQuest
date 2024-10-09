@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 0;
     margin-bottom: 50px;
-    background-color: #000000;
+    background-color: #ffffff;
 }
 
 /* Top Menu Bar */
@@ -20,10 +20,10 @@ body {
 #visualization-image {
     display: block;
     margin: 0 auto;
-    width: 250px; /* Adjust width to make it bigger */
-    height: 120px; /* Set height to auto to maintain aspect ratio */
-    margin-left: 1px; /* Adjust left margin if necessary */
-    margin-top: -5%;
+    width: 150px; /* Adjust width to make it bigger */
+    height: 50px; /* Set height to auto to maintain aspect ratio */
+    margin-left: 10px; /* Adjust left margin if necessary */
+    margin-top: -4.3%;
 }
 
 #right-logos {
@@ -40,9 +40,9 @@ body {
 }
 
 h1 {
-    color: #ffffff;
+    color: #000000;
     text-align: center;
-    margin-top: -2%;
+    margin-top: 40px;
 }
 
 #time-selection {
@@ -55,7 +55,7 @@ h1 {
 
 label {
     font-size: 1.1rem;
-    color: #ffffff;
+    color: #000000;
 }
 
 select, input[type="submit"] {
@@ -84,9 +84,10 @@ input[type="submit"]:hover {
     width: 80%;
     margin-top: 20px;
     margin-left: 10%;
-    border-radius: 20px;
+    border-radius: 30px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    padding: 15px;
 }
 
 /* Make the webpage scrollbar wider and orange in color */
@@ -122,24 +123,24 @@ select::-webkit-scrollbar {
 }
 
 select::-webkit-scrollbar-track {
-    background: #333;
+    background: #ffffff;
     border-radius: 10px;
 }
 
 select::-webkit-scrollbar-thumb {
     background-color: #eb5605;
     border-radius: 10px;
-    border: 2px solid #333;
+    border: 2px solid #ffffff;
 }
 
 select::-webkit-scrollbar-thumb:hover {
-    background-color: #ff8c00;
+    background-color: #eb5605;
 }
 
 /* Ensure dropdown menu looks aesthetic and show the down arrow */
 select {
-    background-color: #000000;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
     padding: 10px;
     border: 1px solid #eb5605;
     border-radius: 20px;

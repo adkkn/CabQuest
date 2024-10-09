@@ -1,7 +1,19 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import folium
+import joblib
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import matplotlib.colors as mcolors
+# import xgboost as xgb
 
 app = Flask(__name__)
+
+# Load the saved model
+model = joblib.load('taxi_model.pkl')
+
+totaltaxis = 12869
 
 regions_data = [
     {"name": "Dubai Marina", "lat": 25.08078, "long": 55.14013, "radius": 1.7}, 
@@ -10,7 +22,7 @@ regions_data = [
     {"name": "Deira", "lat": 25.27958, "long": 55.33041, "radius": 2.8}, 
     {"name": "Palm Jumeirah", "lat": 25.11913, "long": 55.13157, "radius": 2.5},  
     {"name": "Jebel Ali", "lat": 25.01350, "long": 55.09690, "radius": 6.1},  
-    {"name": "Dubai Silicon Oasis", "lat": 25.12422, "long": 55.38496, "radius": 1.7},  
+    # {"name": "Dubai Silicon Oasis", "lat": 25.12422, "long": 55.38496, "radius": 1.7},  
     {"name": "Mirdif", "lat": 25.21952, "long": 55.42481, "radius": 1.7},  
     {"name": "Al Quoz", "lat": 25.16135, "long": 55.25083, "radius": 1.9}, 
     {"name": "Dubai South", "lat": 24.885799, "long": 55.156770, "radius": 5.5},
@@ -23,7 +35,7 @@ regions_data = [
     {"name": "Airport / Garhoud / Festival City / Creek", "lat": 25.224273, "long": 55.351796, "radius": 3.7},
     {"name": "Al Qusais / Al Nahda / Muhaisnah", "lat": 25.281958, "long": 55.397610, "radius": 3.65},
     {"name": "Dubailand", "lat": 25.072645, "long": 55.306568, "radius": 6},
-    {"name": "International City / Warqa", "lat": 25.173760, "long": 55.413906, "radius": 3.5},
+    {"name": "International City / Al Warqa", "lat": 25.173760, "long": 55.413906, "radius": 3.5},
 ]
 
 taxi_ranks = [
@@ -212,27 +224,89 @@ def dubai_map():
     # Create a Folium map
     folium_map = folium.Map(location=dubai_coordinates, zoom_start=11, tiles="OpenStreetMap", scrollWheelZoom=False)
 
-    # Add circles for each region
-    for region in regions_data:
-        folium.Circle(
-            location=[region["lat"], region["long"]],
-            radius=region["radius"] * 1000,  # Use the radius in kilometers, converted to meters
-            color="blue",  # Border color of the circle
-            fill=True,
-            fill_color="lightblue",  # Use a lighter fill color
-            fill_opacity=0.2,  # Reduce the opacity to make the circles more transparent
-            popup=region["name"]
-        ).add_to(folium_map)
-    
     # Add markers for each taxi rank
     for rank in taxi_ranks:
         folium.Marker(
             location=[rank["lat"], rank["long"]],
             popup=rank["name"],
-            icon=folium.Icon(color="blue", icon="taxi", prefix="fa")
+            icon=folium.Icon(color="blue", icon="info-sign")  # Simpler marker icon
         ).add_to(folium_map)
 
     return folium_map._repr_html_()
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        input_data = request.get_json().get('time', 0)
+        print(f"Input time received from frontend: {input_data}")
+
+        # Convert time to the expected format for the model
+        time_in_minutes = int(input_data) * 60
+        time_for_prediction = pd.DataFrame({'Hour': [time_in_minutes]})
+
+        # Get prediction probabilities
+        predicted_region_proba = model.predict_proba(time_for_prediction)[0]
+        print("Prediction results: ", predicted_region_proba)
+
+        # Find minimum and maximum probabilities to normalize the color range
+        min_proba = np.min(predicted_region_proba)
+        max_proba = np.max(predicted_region_proba)
+
+        # Normalize the probabilities
+        normalized_proba = (predicted_region_proba - min_proba) / (max_proba - min_proba + 1e-6)
+
+        # Ensure correct label mapping
+        label_mapping = {
+            0: "Airport / Garhoud / Festival City / Creek",
+            1: "Al Barsha",
+            2: "Al Quoz",
+            3: "Al Qusais / Al Nahda / Muhaisnah",
+            4: "Bur Dubai",
+            5: "DIFC",
+            6: "Deira",
+            7: "Downtown Dubai / Business Bay",
+            8: "Dubai Marina",
+            9: "Dubai Parks",
+            10: "Dubai Silicon Oasis",
+            11: "Dubai South",
+            12: "Dubailand",
+            13: "International City / Al Warqa",
+            14: "Internet City",
+            15: "Jebel Ali",
+            16: "Jumeirah",
+            17: "Mirdif",
+            18: "Palm Jumeirah",
+            19: "WTC"
+        }
+
+        # Generate the map
+        dubai_coordinates = [25.276987, 55.296249]  # Dubai coordinates
+        folium_map = folium.Map(location=dubai_coordinates, zoom_start=11, tiles="OpenStreetMap", scrollWheelZoom=False)
+
+        # Create color gradient based on probability (green = low, red = high)
+        for i, region in enumerate(regions_data):
+            probability = normalized_proba[i]
+            # Generate color gradient
+            color = mcolors.to_hex(mcolors.LinearSegmentedColormap.from_list("", ["green", "yellow", "red"])(probability))
+            
+            # Add circle with color based on probability
+            folium.Circle(
+                location=[region["lat"], region["long"]],
+                radius=region["radius"] * 1000,  # Convert km to meters
+                color=color,
+                fill=True,
+                fill_color=color,
+                fill_opacity=0.7,
+                popup=f"{region['name']}: {probability * 100:.2f}% demand"
+            ).add_to(folium_map)
+
+        # Return the map as HTML
+        return folium_map._repr_html_()
+
+    except Exception as e:
+        print(f"Error while making predictions: {e}")
+        return jsonify({"error": str(e)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
