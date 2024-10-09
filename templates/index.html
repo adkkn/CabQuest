@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CabQuest</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='cabquest_logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <!-- Top Menu Bar -->
+    <div id="menu-bar">
+        <div id="right-logos">
+            <img id="alibaba-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Alibaba_Cloud_Logo.png" alt="Alibaba Cloud Logo">
+            <img id="rta-logo" src="https://seeklogo.com/images/R/rta-logo-87C3DBFFE9-seeklogo.com.png" alt="RTA Logo">
+        </div>
+    </div>
+
+    <img id="visualization-image" src="{{ url_for('static', filename='cabquest_logo.png') }}" alt="CabQuest Logo">
+
+    <h1>TAXI DEMAND VISUALIZATION</h1>
+
+    <!-- Dropdown for selecting time in 30-minute intervals -->
+    <div id="time-selection">
+        <form action="/" method="POST">
+            <label for="time-dropdown">Select a Time:</label>
+            <select id="time-dropdown" name="time">
+                {% for hour, minute in time_intervals %}
+                    <option value="{{ hour }}:{{ '{:02d}'.format(minute) }}" 
+                            {% if selected_time == hour|string + ':' + minute|string %}selected{% endif %}>
+                        {{ hour }}:{{ '{:02d}'.format(minute) }}
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Predict Demand">
+        </form>
+    </div>
+
+    <!-- Map container -->
+    <div id="map-container">
+        <iframe src="/dubai-map" width="100%" height="750px" style="border:none;"></iframe>
+    </div>
+
+</body>
+</html>
