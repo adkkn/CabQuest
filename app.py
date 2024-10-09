@@ -300,6 +300,16 @@ def predict():
                 popup=f"{region['name']}: {probability * 100:.2f}% demand"
             ).add_to(folium_map)
 
+            # Add markers for each taxi rank
+        for rank in taxi_ranks:
+            folium.Marker(
+                location=[rank["lat"], rank["long"]],
+                popup=rank["name"],
+                icon=folium.Icon(color="blue", icon="taxi", prefix="fa")  # Simpler marker icon
+            ).add_to(folium_map)
+
+        # return folium_map._repr_html_()
+
         # Return the map as HTML
         return folium_map._repr_html_()
 
