@@ -229,7 +229,7 @@ def dubai_map():
         folium.Marker(
             location=[rank["lat"], rank["long"]],
             popup=rank["name"],
-            icon=folium.Icon(color="blue", icon="info-sign")  # Simpler marker icon
+            icon=folium.Icon(color="blue", icon="taxi", prefix="fa")  # Simpler marker icon
         ).add_to(folium_map)
 
     return folium_map._repr_html_()
