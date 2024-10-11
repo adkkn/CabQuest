@@ -11,6 +11,10 @@
 
     <!-- Top Menu Bar -->
     <div id="menu-bar">
+        <div id="left-buttons">
+            <button id="taxi-demand-btn">Taxi Demand Prediction</button>
+            <button id="taxi-rank-btn">Taxi Rank Prediction</button>
+        </div>
         <div id="right-logos">
             <img id="alibaba-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Alibaba_Cloud_Logo.png" alt="Alibaba Cloud Logo">
             <img id="rta-logo" src="https://seeklogo.com/images/R/rta-logo-87C3DBFFE9-seeklogo.com.png" alt="RTA Logo">
@@ -19,12 +23,10 @@
 
     <img id="visualization-image" src="{{ url_for('static', filename='cabquest_logo.png') }}" alt="CabQuest Logo">
 
-    <h1>TAXI DEMAND VISUALIZATION</h1>
-
     <!-- Dropdown for selecting time in 30-minute intervals -->
     <div id="time-selection">
         <form action="/predict" method="POST">
-            <label for="time-dropdown">Select a Time:</label>
+            <label for="time-dropdown">Select Time:</label>
             <select id="time-dropdown" name="time">
                 <option value="0">12 AM</option>
                 <option value="1">1 AM</option>
@@ -60,16 +62,38 @@
         <iframe src="/dubai-map" width="100%" height="750px" style="border:none;"></iframe>
     </div>
 
-    <!-- Div to display the prediction results -->
-    <div id="prediction-results"></div>
-
     <script>
+        // Function to switch between Taxi Demand and Taxi Rank
+        document.getElementById('taxi-demand-btn').addEventListener('click', function() {
+            // Show the dropdown and the submit button
+            document.getElementById('time-selection').style.display = 'block';
+    
+            // Load the taxi demand map (default)
+            fetch('/dubai-map')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('map-container').innerHTML = data;
+            });
+        });
+    
+        document.getElementById('taxi-rank-btn').addEventListener('click', function() {
+            // Hide the dropdown and the submit button
+            document.getElementById('time-selection').style.display = 'none';
+    
+            // Clear the map and load the empty map with only taxi ranks
+            fetch('/taxi-rank-map')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('map-container').innerHTML = data;
+            });
+        });
+    
         document.getElementById('predict-button').addEventListener('click', function(event) {
             event.preventDefault();  // Prevent form submission
-        
+    
             // Get the selected time from the dropdown
             let selectedTime = document.getElementById('time-dropdown').value;
-        
+    
             // Send the selected time to the backend for prediction
             fetch('/predict', {
                 method: 'POST',
@@ -86,6 +110,6 @@
             .catch(error => console.error('Error:', error));
         });
     </script>
-    
+
 </body>
 </html>

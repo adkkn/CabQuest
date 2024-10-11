@@ -54,29 +54,35 @@ h1 {
 }
 
 label {
-    font-size: 1.1rem;
+    font-size: large;
     color: #000000;
+    font-weight: bold;
 }
 
 select, input[type="submit"] {
     padding: 10px;
     margin: 10px;
-    font-size: 1rem;
-    border-radius: 20px;
+    font-size: large;
+    border-radius: 25px;
     border: 1px solid #ccc;
     background-color: #fff;
     width: auto;
+    margin-top: 40px;
 }
 
 input[type="submit"] {
-    background-color: #eb5605;
+    background-color: #000000;
     color: white;
     border: none;
     cursor: pointer;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-weight: bold;
 }
 
 input[type="submit"]:hover {
-    background-color: #c90101;
+    color: #eb5605;
+    transition: 0.3s;
 }
 
 #map-container {
@@ -157,4 +163,38 @@ select {
 select:focus {
     outline: none;
     border-color: #ff8c00;
+}
+
+/* Style the new buttons */
+#left-buttons {
+    display: flex;
+    margin-right: auto;  /* Ensures the buttons are aligned to the left */
+    margin-left: 175px;  /* Add space between the buttons and the logo */
+}
+
+#left-buttons button {
+    background-color: #000;  /* Black background */
+    color: #fff;  /* White text */
+    border: none;
+    padding: 10px 20px;
+    font-size: large;
+    margin-right: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#left-buttons button:hover {
+    color: #eb5605;  /* Orange background on hover */
+    transition: 0.3s;  /* Smooth transition */
+}
+
+/* Ensure the right logos align correctly after adding buttons */
+#right-logos {
+    display: flex;
+    align-items: center;
+}
+
+#right-logos img {
+    margin-left: 15px;  /* Add space between the Alibaba Cloud and RTA logo */
 }
