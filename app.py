@@ -172,81 +172,133 @@ def generate_time_intervals():
 @app.route('/', methods=['GET', 'POST'])
 def home():
     selected_time = None
-
     if request.method == 'POST':
         selected_time = request.form['time']
-        print(f"Selected time: {selected_time}")
-
-    return render_template(
-        'index.html', 
-        time_intervals=generate_time_intervals(), 
-        selected_time=selected_time
-    )
+    return render_template('index.html', selected_time=selected_time)
 
 @app.route('/dubai-map')
 def dubai_map():
-    # Center the map on Dubai
-    dubai_coordinates = [25.276987, 55.296249]  # Latitude and Longitude of Dubai
+    dubai_coordinates = [ 25.1513 , 55.2410]
+    folium_map = folium.Map(
+        location=dubai_coordinates, 
+    zoom_start=11, 
+    tiles="OpenStreetMap", 
+    scrollWheelZoom=False,
+    height=500,
+    )
+    
+    # Add custom CSS to remove scrollbars
+    folium_map.get_root().header.add_child(folium.Element("""
+        <style>
+            .folium-map::-webkit-scrollbar { display: none; }
+            .leaflet-container { overflow: hidden !important; }
+            ::-webkit-scrollbar { display: none; }
+            * { scrollbar-width: none; }
+            #map { overflow: hidden !important; }
+        </style>
+    """))
 
-    # Create a Folium map
-    folium_map = folium.Map(location=dubai_coordinates, zoom_start=11, tiles="OpenStreetMap", scrollWheelZoom=False)
-
-    # Add markers for each taxi rank
     for rank in taxi_ranks:
         folium.Marker(
             location=[rank["lat"], rank["long"]],
             popup=rank["name"],
-            icon=folium.Icon(color="blue", icon="taxi", prefix="fa")  # Simpler marker icon
+            icon=folium.Icon(color="blue", icon="taxi", prefix="fa")
         ).add_to(folium_map)
 
     return folium_map._repr_html_()
 
 @app.route('/taxi-rank-map')
 def taxi_rank_map():
-    # Center the map on Dubai
-    dubai_coordinates = [25.276987, 55.296249]  # Latitude and Longitude of Dubai
+    dubai_coordinates = [25.1513 , 55.2410]
+    folium_map = folium.Map(
+        location=dubai_coordinates, 
+        zoom_start=11, 
+        tiles="OpenStreetMap", 
+        scrollWheelZoom=False,
+        height=500  # Set fixed height
+    )
+    
+    # Add custom CSS to remove scrollbars
+    folium_map.get_root().header.add_child(folium.Element("""
+        <style>
+            .folium-map::-webkit-scrollbar { display: none; }
+            .leaflet-container { overflow: hidden !important; }
+            ::-webkit-scrollbar { display: none; }
+            * { scrollbar-width: none; }
+            #map { overflow: hidden !important; }
+        </style>
+    """))
 
-    # Create a Folium map
-    folium_map = folium.Map(location=dubai_coordinates, zoom_start=11, tiles="OpenStreetMap", scrollWheelZoom=False)
-
-    # Add markers for each taxi rank
+    # Add existing taxi ranks
     for rank in taxi_ranks:
         folium.Marker(
             location=[rank["lat"], rank["long"]],
             popup=rank["name"],
-            icon=folium.Icon(color="blue", icon="taxi", prefix="fa")  # Simpler marker icon
+            icon=folium.Icon(color="blue", icon="taxi", prefix="fa")
         ).add_to(folium_map)
 
-            # Add markers for each taxi rank
+    # Add new taxi ranks
     for rank in new_taxi_ranks:
         folium.Marker(
             location=[rank["lat"], rank["long"]],
             popup=rank["name"],
-            icon=folium.Icon(color="orange", icon="taxi", prefix="fa")  # Simpler marker icon
+            icon=folium.Icon(color="orange", icon="taxi", prefix="fa")
         ).add_to(folium_map)
 
     return folium_map._repr_html_()
-
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         input_data = request.get_json().get('time', 0)
-        print(f"Input time received from frontend: {input_data}")
         input_data = int(input_data)
 
-        time_for_prediction = pd.DataFrame({'Hour': [input_data]})  # Example: 14th hour of the day (2 PM)
-        predicted_region_proba = model.predict_proba(time_for_prediction)[0]  # 
+        time_for_prediction = pd.DataFrame({'Hour': [input_data]})
+        predicted_region_proba = model.predict_proba(time_for_prediction)[0]
         predicted = predicted_region_proba * 100
 
-        print("Prediction results: ", predicted)
-
-        # Normalize probabilities between 0 and 1 for color mapping
+        # Normalize probabilities
         min_proba = np.min(predicted_region_proba)
         max_proba = np.max(predicted_region_proba)
-        normalized_proba = (predicted_region_proba - min_proba) / (max_proba - min_proba + 1e-6)  # Normalize between 0 and 1
+        normalized_proba = (predicted_region_proba - min_proba) / (max_proba - min_proba + 1e-6)
 
-        # Ensure correct label mapping
+        # Create map with consistent height
+        dubai_coordinates = [25.1513 , 55.2410]
+        folium_map = folium.Map(
+            location=dubai_coordinates, 
+            zoom_start=11, 
+            tiles="OpenStreetMap", 
+            scrollWheelZoom=False,
+            height=500  # Set fixed height
+        )
+        
+        # Add custom CSS to remove scrollbars
+        folium_map.get_root().header.add_child(folium.Element("""
+        <style>
+            .folium-map::-webkit-scrollbar { display: none; }
+            .leaflet-container { overflow: hidden !important; }
+            ::-webkit-scrollbar { display: none; }
+            * { scrollbar-width: none; }
+            #map { overflow: hidden !important; }
+        </style>
+        """))
+
+        # Add regions with color gradients
+        for i, region in enumerate(regions_data):
+            normalized_probability = normalized_proba[i]
+            color = mcolors.to_hex(mcolors.LinearSegmentedColormap.from_list("", ["green", "red"])(normalized_probability))
+            
+            folium.Circle(
+                location=[region["lat"], region["long"]],
+                radius=region["radius"] * 1000,
+                color=color,
+                fill=True,
+                fill_color=color,
+                fill_opacity=0.7,
+                popup=f"{region['name']}: {predicted[i]:.2f}% demand"
+            ).add_to(folium_map)
+
+        # Label mapping for regions
         label_mapping = {
             0: "Airport / Garhoud / Festival City / Creek",
             1: "Al Barsha",
@@ -270,62 +322,25 @@ def predict():
             19: "WTC"
         }
 
-        # Generate the map
-        dubai_coordinates = [25.276987, 55.296249]  # Dubai coordinates
-        folium_map = folium.Map(location=dubai_coordinates, zoom_start=11, tiles="OpenStreetMap", scrollWheelZoom=False)
-
-        # Create color gradient based on probability (green = low, red = high)
-        for i, region in enumerate(regions_data):
-            normalized_probability = normalized_proba[i]  # Probability normalized between 0 and 1
-            # Generate color gradient using normalized probability
-            color = mcolors.to_hex(mcolors.LinearSegmentedColormap.from_list("", ["green", "red"])(normalized_probability))
-            
-            # Add circle with color based on probability
-            folium.Circle(
-                location=[region["lat"], region["long"]],
-                radius=region["radius"] * 1000,  # Convert km to meters
-                color=color,
-                fill=True,
-                fill_color=color,
-                fill_opacity=0.7,
-                popup=f"{region['name']}: {predicted[i]:.2f}% demand"
-            ).add_to(folium_map)
-
-        #     # Add markers for each taxi rank
-        # for rank in taxi_ranks:
-        #     folium.Marker(
-        #         location=[rank["lat"], rank["long"]],
-        #         popup=rank["name"],
-        #         icon=folium.Icon(color="blue", icon="taxi", prefix="fa")  # Simpler marker icon
-        #     ).add_to(folium_map)
-
-                    # Add markers for each taxi rank with updated ratio
+        # Add taxi rank markers with updated ratios
         for rank in taxi_ranks:
-            # Find the corresponding predicted probability based on the region name
             for idx, region in enumerate(label_mapping.values()):
                 if rank["region"] == region:
-                    # Multiply the taxi rank ratio by the predicted probability for the corresponding region
                     updated_ratio = rank["ratio"] * (predicted_region_proba[idx])
-                    # updated_ratio = float(updated_ratio)
-                    # updated_ratio = np.ceil(updated_ratio)
                     updated_ratio = int(np.ceil(float(updated_ratio)))
 
-                    # Add a marker with the updated ratio in the popup
                     folium.Marker(
                         location=[rank["lat"], rank["long"]],
                         popup=f"{rank['name']}<br><br>Prediction: {updated_ratio} Taxi(s)",
-                        icon=folium.Icon(color="blue", icon="taxi", prefix="fa")  # Simpler marker icon
+                        icon=folium.Icon(color="blue", icon="taxi", prefix="fa")
                     ).add_to(folium_map)
-                    break  # Stop searching once the region is matched
+                    break
 
-
-        # Return the map as HTML
         return folium_map._repr_html_()
 
     except Exception as e:
         print(f"Error while making predictions: {e}")
         return jsonify({"error": str(e)})
-
 
 if __name__ == '__main__':
     app.run(debug=True)

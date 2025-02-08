@@ -13,17 +13,17 @@ body {
     display: flex;
     align-items: center;
     padding: 0 20px;
-    justify-content: flex-end; /* Aligns the whole logo container to the right */
+    justify-content: flex-end;
 }
 
 /* Image styling for the CabQuest logo */
 #visualization-image {
-    display: block;
-    margin: 0 auto;
-    width: 150px; /* Adjust width to make it bigger */
-    height: 50px; /* Set height to auto to maintain aspect ratio */
-    margin-left: 10px; /* Adjust left margin if necessary */
-    margin-top: -4.3%;
+    position: absolute;
+    left: 20px;
+    top: 12px;
+    margin: 0;
+    width: 150px;
+    height: 50px;
 }
 
 #right-logos {
@@ -32,7 +32,7 @@ body {
 }
 
 #right-logos img {
-    margin-left: 15px;  /* Add space between the Alibaba Cloud and RTA logo */
+    margin-left: 15px;
 }
 
 #menu-bar img {
@@ -46,17 +46,20 @@ h1 {
 }
 
 #time-selection {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    left: 200px;
+    top: 85px;
+    text-align: left;
+    transform: translateX(-50%);  /* Adjust for perfect centering */
+    left: 50%;  /* Center horizontally */
 }
 
 label {
     font-size: large;
     color: #000000;
     font-weight: bold;
+    display: inline-block;
+    margin-right: 10px;
 }
 
 select, input[type="submit"] {
@@ -67,7 +70,6 @@ select, input[type="submit"] {
     border: 1px solid #ccc;
     background-color: #fff;
     width: auto;
-    margin-top: 40px;
 }
 
 input[type="submit"] {
@@ -86,78 +88,76 @@ input[type="submit"]:hover {
 }
 
 #map-container {
-    height: 750px;  /* Set the height for the map */
-    width: 80%;
-    margin-top: 20px;
-    margin-left: 10%;
+    height: 450px;
+    width: 50%;
+    margin-top: 0;
+    margin-left: 0;
     border-radius: 30px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     padding: 15px;
+    overflow: hidden;
+    position: absolute;
+    left: 20px;
+    top: 210px;
 }
 
-/* Make the webpage scrollbar wider and orange in color */
+#map-container iframe {
+    overflow: hidden;
+    width: 100%;
+    height: 500px;
+    border: none;
+}
+
+#map-container::-webkit-scrollbar,
+#map-container iframe::-webkit-scrollbar,
+.leaflet-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
-    width: 16px; /* Increase the width */
-    height: 16px; /* Increase height for horizontal scrollbars if applicable */
+    width: 16px;
+    height: 16px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #333;  /* Dark background for scrollbar track */
+    background: #333;
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #eb5605;  /* Set thumb to a solid orange color */
+    background-color: #eb5605;
     border-radius: 10px;
-    border: 3px solid #333;  /* Adds space between thumb and track */
+    border: 3px solid #333;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #ff8c00;  /* Lighter orange on hover */
+    background-color: #ff8c00;
 }
 
-/* Firefox scrollbar styling */
 html {
     scrollbar-width: thin;
-    scrollbar-color: #eb5605 #333; /* Thumb color orange, track color dark */
+    scrollbar-color: #eb5605 #333;
 }
 
-/* Dropdown scrollbars (targeting select elements) */
-select::-webkit-scrollbar {
-    width: 16px; /* Match width of main scrollbar */
-}
-
-select::-webkit-scrollbar-track {
-    background: #ffffff;
-    border-radius: 10px;
-}
-
-select::-webkit-scrollbar-thumb {
-    background-color: #eb5605;
-    border-radius: 10px;
-    border: 2px solid #ffffff;
-}
-
-select::-webkit-scrollbar-thumb:hover {
-    background-color: #eb5605;
-}
-
-/* Ensure dropdown menu looks aesthetic and show the down arrow */
+/* Dropdown Styles */
 select {
     background-color: #ffffff;
     color: rgb(0, 0, 0);
     padding: 10px;
     border: 1px solid #eb5605;
     border-radius: 20px;
-    appearance: none;  /* Removes the default arrow */
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 viewBox%3D%220 0 4 5%22%3E%3Cpath fill%3D%22%23fff%22 d%3D%22M0 0L2 2 4 0z%22/%3E%3C/svg%3E'); /* Down arrow */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 viewBox%3D%220 0 4 5%22%3E%3Cpath fill%3D%22%23fff%22 d%3D%22M0 0L2 2 4 0z%22/%3E%3C/svg%3E');
     background-repeat: no-repeat;
     background-position: right 10px top 50%;
-    background-size: 10px 10px; /* Increased arrow size */
-    width: 100px; /* Increase width of the dropdown input */
+    background-size: 10px 10px;
+    width: 100px;
 }
 
 select:focus {
@@ -165,16 +165,16 @@ select:focus {
     border-color: #ff8c00;
 }
 
-/* Style the new buttons */
+/* Button Styles */
 #left-buttons {
     display: flex;
-    margin-right: auto;  /* Ensures the buttons are aligned to the left */
-    margin-left: 175px;  /* Add space between the buttons and the logo */
+    margin-right: auto;
+    margin-left: 175px;
 }
 
 #left-buttons button {
-    background-color: #000;  /* Black background */
-    color: #fff;  /* White text */
+    background-color: #000;
+    color: #fff;
     border: none;
     padding: 10px 20px;
     font-size: large;
@@ -185,16 +185,20 @@ select:focus {
 }
 
 #left-buttons button:hover {
-    color: #eb5605;  /* Orange background on hover */
-    transition: 0.3s;  /* Smooth transition */
+    color: #eb5605;
+    transition: 0.3s;
 }
 
-/* Ensure the right logos align correctly after adding buttons */
 #right-logos {
     display: flex;
     align-items: center;
 }
 
 #right-logos img {
-    margin-left: 15px;  /* Add space between the Alibaba Cloud and RTA logo */
+    margin-left: 15px;
+}
+
+/* Add this to prevent scrolling on the leaflet container */
+.leaflet-container {
+    overflow: hidden !important;
 }
