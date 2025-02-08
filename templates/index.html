@@ -56,46 +56,71 @@
         </form>
     </div>
 
-    <!-- Map container -->
-    <div id="map-container">
-        <iframe src="/dubai-map" width="100%" height="500px" style="border:none;" scrolling="no" frameborder="0"></iframe>
-    </div>
+<!-- Map container -->
+<div id="map-container">
+    <iframe src="/dubai-map" width="100%" height="500px" style="border:none;" scrolling="no" frameborder="0"></iframe>
+</div>
 
-    <script>
-        document.getElementById('taxi-demand-btn').addEventListener('click', function() {
-            document.getElementById('time-selection').style.display = 'block';
-            fetch('/dubai-map')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('map-container').innerHTML = data;
-            });
+<div id="chart-container">
+    <iframe src="/demand-chart" width="100%" height="500px" style="border:none;" scrolling="no" frameborder="0"></iframe>
+</div>
+
+<script>
+    document.getElementById('taxi-demand-btn').addEventListener('click', function() {
+        document.getElementById('time-selection').style.display = 'block';
+        fetch('/dubai-map')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('map-container').innerHTML = data;
         });
-    
-        document.getElementById('taxi-rank-btn').addEventListener('click', function() {
-            document.getElementById('time-selection').style.display = 'none';
-            fetch('/taxi-rank-map')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('map-container').innerHTML = data;
-            });
+    });
+
+    document.getElementById('taxi-rank-btn').addEventListener('click', function() {
+        document.getElementById('time-selection').style.display = 'none';
+        fetch('/taxi-rank-map')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('map-container').innerHTML = data;
         });
-    
-        document.getElementById('predict-button').addEventListener('click', function(event) {
-            event.preventDefault();
-            let selectedTime = document.getElementById('time-dropdown').value;
-            fetch('/predict', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ time: selectedTime }),
-            })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('map-container').innerHTML = data;
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
+    });
+
+    document.getElementById('predict-button').addEventListener('click', function(event) {
+        event.preventDefault();
+        let selectedTime = document.getElementById('time-dropdown').value;
+        
+        // Update map
+        fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ time: selectedTime }),
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('map-container').innerHTML = data;
+        })
+        .catch(error => console.error('Error updating map:', error));
+
+        // Update chart in a separate request
+        fetch('/update-chart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ time: selectedTime }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.predictions) {
+                document.querySelector('#chart-container iframe').contentWindow.postMessage({
+                    type: 'updateChart',
+                    predictions: data.predictions
+                }, '*');
+            }
+        })
+        .catch(error => console.error('Error updating chart:', error));
+    });
+</script>
 </body>
 </html>

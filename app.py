@@ -341,6 +341,59 @@ def predict():
     except Exception as e:
         print(f"Error while making predictions: {e}")
         return jsonify({"error": str(e)})
+    
+@app.route('/demand-chart')
+def demand_chart():
+    return render_template('chart.html')
+
+@app.route('/update-chart', methods=['POST'])
+def update_chart():
+    try:
+        input_data = request.get_json().get('time', 0)
+        input_data = int(input_data)
+
+        time_for_prediction = pd.DataFrame({'Hour': [input_data]})
+        predicted_region_proba = model.predict_proba(time_for_prediction)[0]
+        predicted = predicted_region_proba * 100
+
+        # Create array of predictions with region names
+        predictions = []
+        label_mapping = {
+            0: "Airport / Garhoud / Festival City / Creek",
+            1: "Al Barsha",
+            2: "Al Quoz",
+            3: "Al Qusais / Al Nahda / Muhaisnah",
+            4: "Bur Dubai",
+            5: "DIFC",
+            6: "Deira",
+            7: "Downtown Dubai / Business Bay",
+            8: "Dubai Marina",
+            9: "Dubai Parks",
+            10: "Dubai Silicon Oasis",
+            11: "Dubai South",
+            12: "Dubailand",
+            13: "International City / Al Warqa",
+            14: "Internet City",
+            15: "Jebel Ali",
+            16: "Jumeirah",
+            17: "Mirdif",
+            18: "Palm Jumeirah",
+            19: "WTC"
+        }
+
+        predictions = [
+            {
+                "name": label_mapping[i],
+                "value": float(predicted[i])
+            }
+            for i in range(len(predicted))
+        ]
+
+        return jsonify({"predictions": predictions})  # Wrap in an object with "predictions" key
+
+    except Exception as e:
+        print(f"Error getting predictions: {e}")
+        return jsonify({"error": str(e)})
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -117,6 +117,19 @@ input[type="submit"]:hover {
     height: 0;
 }
 
+#chart-container {
+    position: absolute;
+    right: 20px;
+    top: 210px;
+    width: 43%;
+    height: 470px;
+    border-radius: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    padding: 5px;
+    overflow: hidden;
+}
+
 /* Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 16px;
