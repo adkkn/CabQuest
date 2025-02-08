@@ -215,7 +215,7 @@ def taxi_rank_map():
         zoom_start=11, 
         tiles="OpenStreetMap", 
         scrollWheelZoom=False,
-        height=500  # Set fixed height
+        height=645  # Set fixed height
     )
     
     # Add custom CSS to remove scrollbars
@@ -269,7 +269,7 @@ def predict():
             zoom_start=11, 
             tiles="OpenStreetMap", 
             scrollWheelZoom=False,
-            height=500  # Set fixed height
+            height=530  # Set fixed height
         )
         
         # Add custom CSS to remove scrollbars
@@ -346,6 +346,10 @@ def predict():
 def demand_chart():
     return render_template('chart.html')
 
+@app.route('/bar-chart')
+def bar_chart():
+    return render_template('bar-chart.html')
+
 @app.route('/update-chart', methods=['POST'])
 def update_chart():
     try:
@@ -389,7 +393,24 @@ def update_chart():
             for i in range(len(predicted))
         ]
 
-        return jsonify({"predictions": predictions})  # Wrap in an object with "predictions" key
+        # Calculate taxi ranks data
+        ranks_data = []
+        for rank in taxi_ranks:
+            for idx, region in enumerate(label_mapping.values()):
+                if rank["region"] == region:
+                    # Calculate number of taxis for this rank
+                    taxis = int(np.ceil(float(rank["ratio"] * predicted_region_proba[idx])))
+                    ranks_data.append({
+                        "name": rank["name"],
+                        "taxis": taxis
+                    })
+                    break
+
+        # Return both predictions and ranks data
+        return jsonify({
+            "predictions": predictions,
+            "ranks": ranks_data
+        })
 
     except Exception as e:
         print(f"Error getting predictions: {e}")
