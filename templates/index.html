@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-
     <!-- Top Menu Bar -->
     <div id="menu-bar">
         <div id="left-buttons">
@@ -23,9 +22,9 @@
 
     <img id="visualization-image" src="{{ url_for('static', filename='cabquest_logo.png') }}" alt="CabQuest Logo">
 
-    <!-- Dropdown for selecting time in 30-minute intervals -->
+    <!-- Dropdown for selecting time -->
     <div id="time-selection">
-        <form action="/predict" method="POST">
+        <form id="predict-form">
             <label for="time-dropdown">Select Time:</label>
             <select id="time-dropdown" name="time">
                 <option value="0">12 AM</option>
@@ -59,28 +58,92 @@
 
     <!-- Map container -->
     <div id="map-container">
-        <iframe src="/dubai-map" width="100%" height="750px" style="border:none;"></iframe>
+        <iframe src="/dubai-map" width="100%" height="500px" style="border:none;" scrolling="no" frameborder="0"></iframe>
+    </div>
+
+    <!-- Chart containers -->
+    <div id="chart-container">
+        <iframe src="/demand-chart" width="100%" height="500px" style="border:none;" scrolling="no" frameborder="0"></iframe>
+    </div>
+
+    <div id="bar-chart-container">
+        <iframe src="/bar-chart" width="100%" height="500px" style="border:none;" scrolling="no" frameborder="0"></iframe>
     </div>
 
     <script>
-        // Function to switch between Taxi Demand and Taxi Rank
+        // Function to get current Dubai time and set dropdown
+        function setCurrentDubaiTime() {
+            // Get current time in Dubai (UTC+4)
+            const dubaiTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
+            const currentHour = dubaiTime.getHours();
+            
+            // Set the dropdown value
+            const timeDropdown = document.getElementById('time-dropdown');
+            timeDropdown.value = currentHour.toString();
+            
+            // Automatically trigger the predict button
+            document.getElementById('predict-button').click();
+        }
+
+        // Call this when page loads
+        window.onload = setCurrentDubaiTime;
+
         document.getElementById('taxi-demand-btn').addEventListener('click', function() {
-            // Show the dropdown and the submit button
-            document.getElementById('time-selection').style.display = 'block';
+    document.getElementById('time-selection').style.display = 'block';
+    document.getElementById('chart-container').style.display = 'block';
+    document.getElementById('bar-chart-container').style.display = 'block';
+    document.getElementById('map-container').classList.remove('full-width');
+
+    // Get current Dubai time
+    const dubaiTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
+    const currentHour = dubaiTime.getHours();
     
-            // Load the taxi demand map (default)
-            fetch('/dubai-map')
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('map-container').innerHTML = data;
-            });
-        });
+    // Set the dropdown value to current hour
+    document.getElementById('time-dropdown').value = currentHour.toString();
     
+    // Trigger predictions with current time
+    fetch('/predict', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ time: currentHour }),
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('map-container').innerHTML = data;
+    })
+    .catch(error => console.error('Error updating map:', error));
+
+    // Update charts
+    fetch('/update-chart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ time: currentHour }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.predictions) {
+            document.querySelector('#chart-container iframe').contentWindow.postMessage({
+                type: 'updateChart',
+                predictions: data.predictions
+            }, '*');
+            document.querySelector('#bar-chart-container iframe').contentWindow.postMessage({
+                type: 'updateBarChart',
+                ranks: data.ranks
+            }, '*');
+        }
+    })
+    .catch(error => console.error('Error updating charts:', error));
+});
+        
         document.getElementById('taxi-rank-btn').addEventListener('click', function() {
-            // Hide the dropdown and the submit button
             document.getElementById('time-selection').style.display = 'none';
-    
-            // Clear the map and load the empty map with only taxi ranks
+            document.getElementById('chart-container').style.display = 'none';
+            document.getElementById('bar-chart-container').style.display = 'none';
+            document.getElementById('map-container').classList.add('full-width');
             fetch('/taxi-rank-map')
             .then(response => response.text())
             .then(data => {
@@ -89,12 +152,10 @@
         });
     
         document.getElementById('predict-button').addEventListener('click', function(event) {
-            event.preventDefault();  // Prevent form submission
-    
-            // Get the selected time from the dropdown
+            event.preventDefault();
             let selectedTime = document.getElementById('time-dropdown').value;
-    
-            // Send the selected time to the backend for prediction
+            
+            // Update map
             fetch('/predict', {
                 method: 'POST',
                 headers: {
@@ -104,12 +165,35 @@
             })
             .then(response => response.text())
             .then(data => {
-                // Update the iframe content with the new map returned from the backend
                 document.getElementById('map-container').innerHTML = data;
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Error updating map:', error));
+
+            // Update chart
+            fetch('/update-chart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ time: selectedTime }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.predictions) {
+                    document.querySelector('#chart-container iframe').contentWindow.postMessage({
+                        type: 'updateChart',
+                        predictions: data.predictions
+                    }, '*');
+
+                    // Update new bar chart
+                    document.querySelector('#bar-chart-container iframe').contentWindow.postMessage({
+                        type: 'updateBarChart',
+                        ranks: data.ranks
+                    }, '*');
+                }
+            })
+            .catch(error => console.error('Error updating chart:', error));
         });
     </script>
-
 </body>
 </html>
