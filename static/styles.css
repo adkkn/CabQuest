@@ -8,22 +8,22 @@ body {
 
 /* Top Menu Bar */
 #menu-bar {
-    background-color: #000;
+    background-color: #ffffff;
     height: 75px;
     display: flex;
     align-items: center;
     padding: 0 20px;
     justify-content: flex-end; /* Aligns the whole logo container to the right */
+    margin-bottom: 10px;
 }
 
 /* Image styling for the CabQuest logo */
 #visualization-image {
-    display: block;
-    margin: 0 auto;
     width: 150px; /* Adjust width to make it bigger */
     height: 50px; /* Set height to auto to maintain aspect ratio */
-    margin-left: 10px; /* Adjust left margin if necessary */
-    margin-top: -4.3%;
+    margin-left: 80px; /* Adjust left margin if necessary */
+    margin-top: -65px;
+    position: absolute;
 }
 
 #right-logos {
@@ -36,7 +36,9 @@ body {
 }
 
 #menu-bar img {
-    height: 30px;
+    margin-right: 55px;
+    height: 70px;
+    width: 230px;
 }
 
 h1 {
@@ -54,106 +56,41 @@ h1 {
 }
 
 label {
-    font-size: large;
+    font-size:large;
     color: #000000;
     font-weight: bold;
+    margin-right: 5px;
 }
 
 select, input[type="submit"] {
-    padding: 10px;
+    padding: 11px;
     margin: 10px;
-    font-size: large;
-    border-radius: 25px;
+    font-size: medium;
+    border-radius: 30px;
     border: 1px solid #ccc;
     background-color: #fff;
     width: auto;
-    margin-top: 40px;
 }
 
 input[type="submit"] {
-    background-color: #000000;
+    background-color: #09139e;
     color: white;
     border: none;
     cursor: pointer;
     padding-left: 15px;
     padding-right: 15px;
-    font-weight: bold;
 }
 
 input[type="submit"]:hover {
-    color: #eb5605;
+    background-color: #000dc3;
     transition: 0.3s;
-}
-
-#map-container {
-    height: 750px;  /* Set the height for the map */
-    width: 80%;
-    margin-top: 20px;
-    margin-left: 10%;
-    border-radius: 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    padding: 15px;
-}
-
-/* Make the webpage scrollbar wider and orange in color */
-::-webkit-scrollbar {
-    width: 16px; /* Increase the width */
-    height: 16px; /* Increase height for horizontal scrollbars if applicable */
-}
-
-::-webkit-scrollbar-track {
-    background: #333;  /* Dark background for scrollbar track */
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #eb5605;  /* Set thumb to a solid orange color */
-    border-radius: 10px;
-    border: 3px solid #333;  /* Adds space between thumb and track */
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background-color: #ff8c00;  /* Lighter orange on hover */
-}
-
-/* Firefox scrollbar styling */
-html {
-    scrollbar-width: thin;
-    scrollbar-color: #eb5605 #333; /* Thumb color orange, track color dark */
-}
-
-/* Dropdown scrollbars (targeting select elements) */
-select::-webkit-scrollbar {
-    width: 16px; /* Match width of main scrollbar */
-}
-
-select::-webkit-scrollbar-track {
-    background: #ffffff;
-    border-radius: 10px;
-}
-
-select::-webkit-scrollbar-thumb {
-    background-color: #eb5605;
-    border-radius: 10px;
-    border: 2px solid #ffffff;
-}
-
-select::-webkit-scrollbar-thumb:hover {
-    background-color: #eb5605;
 }
 
 /* Ensure dropdown menu looks aesthetic and show the down arrow */
 select {
     background-color: #ffffff;
     color: rgb(0, 0, 0);
-    padding: 10px;
-    border: 1px solid #eb5605;
-    border-radius: 20px;
-    appearance: none;  /* Removes the default arrow */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 viewBox%3D%220 0 4 5%22%3E%3Cpath fill%3D%22%23fff%22 d%3D%22M0 0L2 2 4 0z%22/%3E%3C/svg%3E'); /* Down arrow */
+    border: 1px solid #8b8b8b;
     background-repeat: no-repeat;
     background-position: right 10px top 50%;
     background-size: 10px 10px; /* Increased arrow size */
@@ -162,30 +99,29 @@ select {
 
 select:focus {
     outline: none;
-    border-color: #ff8c00;
+    border-color: #8b8b8b;
 }
 
 /* Style the new buttons */
 #left-buttons {
     display: flex;
     margin-right: auto;  /* Ensures the buttons are aligned to the left */
-    margin-left: 175px;  /* Add space between the buttons and the logo */
+    margin-left: 230px;  /* Add space between the buttons and the logo */
+    margin-top: 15px;
 }
 
 #left-buttons button {
-    background-color: #000;  /* Black background */
-    color: #fff;  /* White text */
+    background-color: #ffffff;  /* Black background */
+    color: #05034a;  /* White text */
     border: none;
     padding: 10px 20px;
-    font-size: large;
-    margin-right: 15px;
-    border-radius: 5px;
+    font-size: medium;
     cursor: pointer;
     font-weight: bold;
 }
 
 #left-buttons button:hover {
-    color: #eb5605;  /* Orange background on hover */
+    color: #d41f07;  /* Orange background on hover */
     transition: 0.3s;  /* Smooth transition */
 }
 
@@ -197,4 +133,146 @@ select:focus {
 
 #right-logos img {
     margin-left: 15px;  /* Add space between the Alibaba Cloud and RTA logo */
+}
+
+/* Center the whole content container */
+#content-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Align items in the middle */
+    gap: 30px; /* Space between map and charts */
+    width: 90%; /* Ensures responsiveness */
+    margin: auto;
+    margin-top: 40px; /* Adjust top margin */
+}
+
+/* Map container on the left */
+#map-container {
+    height: 30%;
+    width: 60%;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    overflow: hidden;
+    margin-top: -265px;
+}
+
+/* Right-side charts container */
+#charts-container {
+    display: flex;
+    flex-direction: column; /* Stack charts vertically */
+    align-items: center; /* Center charts horizontally */
+    gap: 30px; /* Space between pie chart and bar chart */
+}
+
+/* Individual chart styling */
+#chart-container, #bar-chart-container {
+    width: 450px; /* Set the width for each chart */
+    height: 370px; /* Adjust height */
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    padding: 20px;
+    overflow: hidden;
+}
+
+/* Adjust bar chart height */
+#bar-chart-container {
+    height: 250px;
+}
+/* 
+#map-container.full-width {
+    width: 97% !important;  
+    height: 80% !important;
+    top:100px !important;
+} */
+
+#map-container iframe {
+    overflow: hidden;
+    width: 100%;
+    height: 500px;
+    border: none;
+}
+
+#map-container::-webkit-scrollbar,
+#map-container iframe::-webkit-scrollbar,
+.leaflet-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.leaflet-container {
+    overflow: hidden !important;
+}
+
+/* AI Overview Container */
+#ai-overview-container {
+    width: 735px;
+    height: 190px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    margin-left: 75px;
+    margin-top: -230px;
+}
+
+#ai-overview-container h2 {
+    color: #000000;
+    font-size: 24px;
+    margin-bottom: 10px;
+    margin-top: -0.1px;
+}
+
+#ai-overview-text {
+    font-size: 18px;
+    color: black;
+    /* font-weight: bold; */
+    text-align: left;
+    white-space: pre-wrap;
+    min-height: 50px;
+}
+
+/* AI Overview Header with Gemini Logo */
+#ai-overview-header {
+    display: flex;
+    align-items: center; /* Align text and image vertically */
+    gap: 12px; /* Space between image and text */
+}
+
+/* Gemini Logo Styling */
+#gemini-logo {
+    width: 34px; /* Match 24px font size */
+    height: 34px; /* Keep it square */
+    margin-top: -10px;
+}
+
+/* Taxi Rank Containers */
+#taxi-rank-container {
+    display: flex;
+    flex-direction: column; /* Arrange map & graph in a column */
+    align-items: center; /* Center content */
+    gap: 20px; /* Add space between map and graph */
+    width: 90%; /* Ensures responsiveness */
+    margin: auto;
+}
+
+/* Individual Styles */
+#taxi-rank-map {
+    width: 100%;
+    height: 500px;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+#taxi-rank-graph {
+    width: 700px;
+    height: 350px;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    margin-left: 22.5%;
 }

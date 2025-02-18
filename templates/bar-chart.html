@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Top Taxi Ranks</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-container {
+            width: 100%;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-title {
+            text-align: center;
+            margin: 5px 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-title">Top Taxi Ranks</div>
+    <div class="chart-container">
+        <canvas id="rankChart"></canvas>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('rankChart').getContext('2d');
+        let barChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Number of Taxis',
+                    data: [],
+                    backgroundColor: '#0088FE',
+                    borderColor: '#0088FE',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.raw} taxis`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Taxis'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            autoSkip: false, // Prevent automatic skipping
+                            maxTicksLimit: 10, // Ensure 10 labels are shown
+                            callback: function(value) {
+                                const label = this.getLabelForValue(value);
+                                return label.length > 13 ? label.substring(13, 33) + (label.length > 33 ? '...' : '') : label;
+                            }
+                        }
+                    }
+
+                }
+            }
+        });
+
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'updateBarChart' && Array.isArray(event.data.ranks)) {
+                const topRanks = event.data.ranks
+                    .sort((a, b) => b.taxis - a.taxis)
+                    .slice(0, 10);
+
+                barChart.data.labels = topRanks.map(r => r.name);
+                barChart.data.datasets[0].data = topRanks.map(r => r.taxis);
+                barChart.update();
+            }
+        });
+    </script>
+</body>
+</html>

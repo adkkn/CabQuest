@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Demand Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-container {
+            width: 80%;
+            height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-title {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 10px;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-title">Area-wise Taxi Demand</div>
+    <div class="chart-container">
+        <canvas id="demandChart"></canvas>
+    </div>
+
+    <script>
+        // Initialize the chart with empty data
+        const ctx = document.getElementById('demandChart').getContext('2d');
+        let myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8',
+                        '#82ca9d', '#ff7300', '#a4de6c', '#d0ed57', '#83a6ed',
+                        '#ffc658', '#8dd1e1', '#a4de6c', '#d0ed57', '#83a6ed',
+                        '#ffc658', '#8dd1e1', '#82ca9d', '#a4de6c', '#d0ed57'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                layout: {
+                    padding: {
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        left: 0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw.toFixed(1)}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Listen for messages from parent window
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'updateChart' && Array.isArray(event.data.predictions)) {
+                const predictions = event.data.predictions;
+
+                // Update chart data
+                myChart.data.labels = predictions.map(p => p.name);
+                myChart.data.datasets[0].data = predictions.map(p => p.value);
+
+                // Update the chart
+                myChart.update();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Proposed Taxi Ranks by Priority</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chart-container {
+            width: 80%;
+            max-width: 600px;
+        }
+        .chart-title {
+            text-align: center;
+            margin: 10px 0;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-title">Proposed Taxi Ranks by Priority</div>
+    <div class="chart-container">
+        <canvas id="priorityChart"></canvas>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('priorityChart').getContext('2d');
+        let red_count = 0, orange_count = 0, purple_count = 0, green_count = 0; // Placeholder values
+        let barChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4'],
+                datasets: [{
+                    label: 'Number of Taxi Ranks',
+                    data: [4, 29, 56, 32],
+                    backgroundColor: ['#FF0000', '#FFA500', '#800080', '#008000'],
+                    borderColor: ['#CC0000', '#CC8400', '#660066', '#006600'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.raw} taxi ranks`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Taxi Ranks'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Priority Level'
+                        }
+                    }
+                }
+            }
+        });
+
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'updateBarChart') {
+                red_count = event.data.red_count || 0;
+                orange_count = event.data.orange_count || 0;
+                purple_count = event.data.purple_count || 0;
+                green_count = event.data.green_count || 0;
+                barChart.data.datasets[0].data = [red_count, orange_count, purple_count, green_count];
+                barChart.update();
+            }
+        });
+    </script>
+</body>
+</html>
