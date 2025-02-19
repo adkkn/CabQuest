@@ -258,6 +258,7 @@ select:focus {
     gap: 20px; /* Add space between map and graph */
     width: 90%; /* Ensures responsiveness */
     margin: auto;
+    margin-top: -15px;
 }
 
 /* Individual Styles */

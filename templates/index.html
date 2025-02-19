@@ -95,13 +95,13 @@
 
     <script>
 
-    function fetchAIOverview() {
+    function fetchAIOverview(selectedTime = new Date().getHours()) {
         document.getElementById('ai-overview-text').innerText = "Fetching AI insights...";
 
         fetch('/update-chart', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ time: new Date().getHours() })
+            body: JSON.stringify({ time: selectedTime })  // Use selected time
         })
         .then(response => response.json())
         .then(data => {
@@ -118,7 +118,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.summary) {
-                typeWriterEffect("ai-overview-text", data.summary);
+                typeWriterEffect("ai-overview-text", data.summary);  // Use typewriter effect
             } else {
                 document.getElementById('ai-overview-text').innerText = "Error fetching AI insights.";
             }
@@ -129,18 +129,27 @@
         });
     }
 
-    // Function to display text with a typewriter effect
+    let typewriterTimeouts = []; // Store timeouts to prevent conflicts
+
     function typeWriterEffect(elementId, text, speed = 15) {
         let i = 0;
         let element = document.getElementById(elementId);
-        element.innerText = ""; // Clear previous text
+
+        // Clear previous timeouts if the function is called again
+        typewriterTimeouts.forEach(timeout => clearTimeout(timeout));
+        typewriterTimeouts = [];
+
+        element.innerText = ""; // Ensure text is cleared before typing starts
+
         function type() {
             if (i < text.length) {
                 element.innerText += text.charAt(i);
                 i++;
-                setTimeout(type, speed);
+                let timeout = setTimeout(type, speed);
+                typewriterTimeouts.push(timeout);
             }
         }
+
         type();
     }
 
@@ -164,9 +173,20 @@
     }
 
     document.getElementById('taxi-demand-btn').addEventListener('click', function() {
+    // Hide Taxi Rank elements
+    document.getElementById('taxi-rank-container').style.display = 'none';
+    document.getElementById('taxi-rank-map').style.display = 'none';
+    document.getElementById('taxi-rank-graph').style.display = 'none';
+
+    // Show Taxi Demand elements
+    document.getElementById('map-container').style.display = 'block';
+    document.getElementById('charts-container').style.display = 'flex';
     document.getElementById('time-selection').style.display = 'block';
+    document.getElementById('ai-overview-container').style.display = 'block';
+
     document.getElementById('chart-container').style.display = 'block';
     document.getElementById('bar-chart-container').style.display = 'block';
+
     document.getElementById('map-container').classList.remove('full-width');
 
     // Get current Dubai time
@@ -223,6 +243,8 @@
 
             // Show the new Taxi Rank Prediction section
             document.getElementById('taxi-rank-container').style.display = 'block';
+            document.getElementById('taxi-rank-map').style.display = 'block';
+            document.getElementById('taxi-rank-graph').style.display = 'block';
         });
 
     
@@ -266,6 +288,7 @@
                         ranks: data.ranks
                     }, '*');
                 }
+                fetchAIOverview(selectedTime);  // <-- Add this line
             })
             .catch(error => console.error('Error updating chart:', error));
         });
